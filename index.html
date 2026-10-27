@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EIT Cram - Ôn Thi Tiếng Anh Chuyên Ngành CNTT Cấp Tốc</title>
+  <meta name="description" content="Trang web ôn tập cấp tốc Tiếng Anh chuyên ngành Công nghệ thông tin cho kỳ thi cuối kỳ: 48 định nghĩa, 50 câu điền từ, 50 câu đúng/sai kèm giải thích chi tiết.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app" class="app-container">
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="logo-badge">EIT</div>
+        <div class="header-titles">
+          <h1 class="app-title">Tiếng Anh Chuyên Ngành CNTT</h1>
+          <p class="app-subtitle">Cẩm nang ôn thi cấp tốc 2 giờ • Trọn bộ 148 câu đề cương</p>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <!-- 2-Hour Study Countdown Timer -->
+        <div class="timer-box" id="timerContainer" title="Thời gian ôn thi cấp tốc 2 tiếng">
+          <span class="timer-icon">⏱️</span>
+          <div class="timer-details">
+            <span class="timer-label">ĐỒNG HỒ ÔN TẬP</span>
+            <span class="timer-display" id="timerDisplay">02:00:00</span>
+          </div>
+          <button id="timerToggleBtn" class="timer-btn" aria-label="Tạm dừng/Bắt đầu đếm ngược">⏸️</button>
+          <button id="timerResetBtn" class="timer-btn" aria-label="Đặt lại đếm ngược 2 tiếng">🔄</button>
+        </div>
+
+        <!-- Audio Toggle Button -->
+        <button id="soundToggleBtn" class="icon-btn" aria-label="Bật/Tắt âm thanh" title="Âm thanh hiệu ứng">
+          <span id="soundIcon">🔊</span>
+        </button>
+
+        <!-- Theme Toggle Button -->
+        <button id="themeToggleBtn" class="icon-btn" aria-label="Chuyển chế độ sáng/tối" title="Giao diện Sáng/Tối">
+          <span id="themeIcon">🌙</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="parts-nav" aria-label="Phần ôn tập">
+      <button class="nav-tab active" data-part="part2" id="tabPart2">
+        <span class="tab-badge">50 câu</span>
+        <span class="tab-icon">✍️</span>
+        <span class="tab-text">Phần II: Điền Từ Vào Chỗ Trống</span>
+      </button>
+      <button class="nav-tab" data-part="part1" id="tabPart1">
+        <span class="tab-badge">48 từ</span>
+        <span class="tab-icon">🔤</span>
+        <span class="tab-text">Phần I: Nối Thuật Ngữ & Định Nghĩa</span>
+      </button>
+      <button class="nav-tab" data-part="part3" id="tabPart3">
+        <span class="tab-badge">50 câu</span>
+        <span class="tab-icon">⚖️</span>
+        <span class="tab-text">Phần III: Quyết Định Đúng / Sai (T/F)</span>
+      </button>
+      <button class="nav-tab" data-part="cheatsheet" id="tabCheatsheet">
+        <span class="tab-badge">148 câu</span>
+        <span class="tab-icon">📖</span>
+        <span class="tab-text">Sổ Tay Tra Cứu Toàn Bộ</span>
+      </button>
+    </nav>
+
+    <!-- Control Toolbar (Mode switcher, filters, progress) -->
+    <div class="toolbar" id="quizToolbar">
+      <div class="toolbar-left">
+        <!-- Study Mode Selector -->
+        <div class="mode-selector" id="modeSelector" role="group" aria-label="Chế độ học">
+          <button class="mode-btn active" data-mode="fill" id="modeFillBtn" title="Gõ từ còn thiếu trực tiếp">
+            <span>⌨️</span> Gõ Điền Từ
+          </button>
+          <button class="mode-btn" data-mode="choice" id="modeChoiceBtn" title="Chọn 1 trong 4 đáp án trắc nghiệm">
+            <span>🔘</span> Trắc Nghiệm 4 Đáp Án
+          </button>
+          <button class="mode-btn" data-mode="flashcard" id="modeFlashcardBtn" title="Lật thẻ ghi nhớ nhanh">
+            <span>🃏</span> Thẻ Ghi Nhớ (Flashcard)
+          </button>
+        </div>
+
+        <!-- Filter Selector -->
+        <div class="filter-dropdown">
+          <label for="filterSelect" class="sr-only">Bộ lọc câu hỏi</label>
+          <select id="filterSelect" class="custom-select">
+            <option value="all">Tất cả câu hỏi</option>
+            <option value="unattempted">Chưa làm</option>
+            <option value="wrong">Cần ôn lại (Làm sai)</option>
+            <option value="bookmarked">Đã đánh dấu sao (⭐)</option>
+          </select>
+        </div>
+
+        <!-- Shuffle Toggle -->
+        <button id="shuffleBtn" class="toggle-tool-btn" title="Xáo trộn câu hỏi ngẫu nhiên">
+          <span>🔀</span> <span id="shuffleText">Theo Đề Cương</span>
+        </button>
+      </div>
+
+      <div class="toolbar-right">
+        <!-- Progress Indicator -->
+        <div class="progress-pill">
+          <span id="progressText">Câu 1 / 50</span>
+          <div class="progress-bar-mini">
+            <div id="progressBarFill" class="progress-bar-fill" style="width: 2%;"></div>
+          </div>
+        </div>
+
+        <!-- Grid Drawer Toggle -->
+        <button id="toggleGridBtn" class="toggle-tool-btn" title="Danh sách câu hỏi 1-50">
+          <span>🔢</span> Danh Sách Câu
+        </button>
+
+        <!-- Reset Button -->
+        <button id="resetPartBtn" class="tool-btn-danger" title="Xóa lịch sử làm phần này để làm lại từ đầu">
+          <span>🗑️</span> Làm Lại
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content Area: Interactive Quiz View -->
+    <main class="main-content" id="quizView">
+      <div class="card quiz-card" id="cardContainer">
+        <!-- Card Header: Number, Star, Category Badge -->
+        <div class="card-header">
+          <div class="question-meta">
+            <span class="part-indicator" id="partBadge">Phần II: Điền Từ</span>
+            <span class="question-counter-badge" id="cardIndexBadge">Câu 1 / 50</span>
+            <span class="status-indicator" id="statusIndicator"></span>
+          </div>
+
+          <div class="card-actions">
+            <button id="bookmarkBtn" class="action-btn" title="Đánh dấu câu khó (Phím S)" aria-label="Đánh dấu sao">
+              <span id="bookmarkIcon">☆</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Question Body Area -->
+        <div class="card-body">
+          <div class="question-prompt" id="questionPrompt">
+            <!-- Question prompt text is injected dynamically -->
+          </div>
+
+          <div class="vietnamese-translation" id="vietnameseBox" style="display: none;">
+            <span class="vn-label">Dịch nghĩa:</span>
+            <span id="vietnameseText" class="vn-content"></span>
+          </div>
+
+          <!-- Fill-in-the-blank Interactive Input Box -->
+          <div class="interaction-area" id="fillInteraction">
+            <form id="answerForm" class="answer-form" autocomplete="off" onsubmit="return false;">
+              <div class="input-wrapper">
+                <input 
+                  type="text" 
+                  id="answerInput" 
+                  class="text-input" 
+                  placeholder="Gõ từ / cụm từ cần điền vào đây rồi ấn Enter..." 
+                  autofocus 
+                  spellcheck="false"
+                  autocomplete="off"
+                >
+                <button type="submit" id="submitAnswerBtn" class="btn btn-primary">
+                  <span>Kiểm Tra</span>
+                  <span class="key-hint">Enter</span>
+                </button>
+              </div>
+            </form>
+
+            <div class="quick-helpers">
+              <button id="hintBtn" class="helper-btn" title="Gợi ý số chữ cái và ký tự đầu (Phím H)">
+                <span>💡</span> Gợi Ý (Hint)
+              </button>
+              <button id="revealBtn" class="helper-btn" title="Xem ngay đáp án đúng (Phím R)">
+                <span>👁️</span> Xem Đáp Án
+              </button>
+            </div>
+
+            <!-- Hint box container -->
+            <div id="hintBox" class="hint-display" style="display: none;"></div>
+          </div>
+
+          <!-- Multiple Choice Interactive Options (4 choices) -->
+          <div class="interaction-area" id="choiceInteraction" style="display: none;">
+            <div class="choice-grid" id="choiceOptionsContainer">
+              <!-- Injected dynamically -->
+            </div>
+          </div>
+
+          <!-- True / False Interactive Buttons -->
+          <div class="interaction-area" id="tfInteraction" style="display: none;">
+            <div class="tf-btn-group">
+              <button id="tfTrueBtn" class="btn tf-btn tf-true-btn" data-answer="T">
+                <span class="tf-badge">T</span>
+                <span class="tf-text">ĐÚNG (True)</span>
+                <span class="key-hint">Phím T</span>
+              </button>
+              <button id="tfFalseBtn" class="btn tf-btn tf-false-btn" data-answer="F">
+                <span class="tf-badge">F</span>
+                <span class="tf-text">SAI (False)</span>
+                <span class="key-hint">Phím F</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Flashcard Flip Interactive View -->
+          <div class="interaction-area" id="flashcardInteraction" style="display: none;">
+            <div class="flashcard-box" id="flashcardBox" tabindex="0" role="button" aria-label="Bấm vào thẻ hoặc phím Space để lật đáp án">
+              <div class="flashcard-inner" id="flashcardInner">
+                <div class="flashcard-front">
+                  <div class="flashcard-tag">MẶT TRƯỚC: CÂU HỎI</div>
+                  <div class="flashcard-content" id="flashcardFrontContent"></div>
+                  <div class="flashcard-hint-text">👆 Bấm vào thẻ hoặc nhấn Phím Cách (Space) để lật đáp án</div>
+                </div>
+                <div class="flashcard-back">
+                  <div class="flashcard-tag">MẶT SAU: ĐÁP ÁN ĐÚNG</div>
+                  <div class="flashcard-answer-title" id="flashcardAnswerTitle"></div>
+                  <div class="flashcard-content" id="flashcardBackContent"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flashcard-controls">
+              <button id="flashcardPrevBtn" class="btn btn-secondary">⬅️ Câu Trước</button>
+              <button id="flashcardFlipBtn" class="btn btn-outline">🔄 Lật Thẻ (Space)</button>
+              <button id="flashcardNextBtn" class="btn btn-primary">Câu Tiếp Theo ➡️</button>
+            </div>
+          </div>
+
+          <!-- Answer Feedback Banner (Appears after checking) -->
+          <div class="feedback-banner" id="feedbackBanner" style="display: none;">
+            <div class="feedback-header">
+              <span id="feedbackIcon" class="feedback-icon"></span>
+              <span id="feedbackTitle" class="feedback-title"></span>
+            </div>
+
+            <div class="feedback-details">
+              <div class="feedback-row" id="feedbackUserRow" style="display: none;">
+                <span class="feedback-label">Bạn đã điền:</span>
+                <span id="feedbackUserVal" class="user-typed-val"></span>
+              </div>
+              <div class="feedback-row">
+                <span class="feedback-label">Đáp án đúng:</span>
+                <span id="feedbackCorrectVal" class="correct-val"></span>
+              </div>
+              <div class="feedback-row" id="feedbackFullSentRow" style="display: none;">
+                <span class="feedback-label">Câu hoàn chỉnh:</span>
+                <span id="feedbackFullSent" class="full-sent-val"></span>
+              </div>
+              <div class="feedback-row" id="feedbackExplanationRow" style="display: none;">
+                <span class="feedback-label">Giải thích chi tiết:</span>
+                <span id="feedbackExplanation" class="explanation-val"></span>
+              </div>
+              <div class="feedback-row" id="feedbackVnRow" style="display: none;">
+                <span class="feedback-label">Dịch tiếng Việt:</span>
+                <span id="feedbackVn" class="vn-val"></span>
+              </div>
+            </div>
+
+            <div class="feedback-actions">
+              <button id="feedbackNextBtn" class="btn btn-success btn-lg">
+                <span>Câu Tiếp Theo ➡️</span>
+                <span class="key-hint">Enter / Phím Phải</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Footer Navigation -->
+        <div class="card-footer">
+          <div class="footer-left">
+            <button id="prevQuestionBtn" class="btn btn-secondary" title="Quay lại câu trước (Phím Mũi Tên Trái)">
+              <span>⬅️</span> Trước
+            </button>
+          </div>
+
+          <div class="footer-center">
+            <div class="score-pills">
+              <span class="score-pill score-correct" title="Số câu đúng">
+                <span class="dot dot-green"></span> Đúng: <strong id="statsCorrect">0</strong>
+              </span>
+              <span class="score-pill score-wrong" title="Số câu làm sai cần xem lại">
+                <span class="dot dot-red"></span> Sai: <strong id="statsWrong">0</strong>
+              </span>
+              <span class="score-pill score-remaining" title="Số câu chưa làm">
+                <span class="dot dot-gray"></span> Còn lại: <strong id="statsRemaining">50</strong>
+              </span>
+            </div>
+          </div>
+
+          <div class="footer-right">
+            <button id="skipQuestionBtn" class="btn btn-outline" title="Bỏ qua làm câu khác">
+              Bỏ Qua
+            </button>
+            <button id="nextQuestionBtn" class="btn btn-primary" title="Sang câu tiếp theo (Phím Mũi Tên Phải)">
+              Tiếp <span>➡️</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collapsible Question Grid Drawer -->
+      <aside class="grid-drawer" id="gridDrawer">
+        <div class="grid-drawer-header">
+          <h3 class="drawer-title">Bản Đồ Câu Hỏi</h3>
+          <div class="drawer-legend">
+            <span class="legend-item"><span class="dot dot-green"></span> Đúng</span>
+            <span class="legend-item"><span class="dot dot-red"></span> Sai</span>
+            <span class="legend-item"><span class="dot dot-gray"></span> Chưa làm</span>
+            <span class="legend-item">⭐ Đã lưu</span>
+          </div>
+          <button id="closeGridDrawerBtn" class="icon-btn-close" aria-label="Đóng bảng câu hỏi">✕</button>
+        </div>
+
+        <div class="grid-buttons-container" id="gridButtonsContainer">
+          <!-- Injected dynamically 1 to N buttons -->
+        </div>
+      </aside>
+    </main>
+
+    <!-- Cheatsheet View (Full Reference / Fast Review 148 items) -->
+    <section class="cheatsheet-section" id="cheatsheetView" style="display: none;">
+      <div class="cheatsheet-toolbar">
+        <div class="search-box-wrapper">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="search" 
+            id="cheatsheetSearchInput" 
+            class="search-input" 
+            placeholder="Tìm kiếm nhanh bất kỳ từ khóa nào (ví dụ: database, topology, cloud, ransomware, protocol...)"
+          >
+          <button id="clearSearchBtn" class="clear-search-btn" style="display: none;">✕</button>
+        </div>
+
+        <div class="cheatsheet-filter-group">
+          <button class="cs-filter-btn active" data-cs-filter="all">Tất cả (148 câu)</button>
+          <button class="cs-filter-btn" data-cs-filter="part2">Điền từ (50 câu)</button>
+          <button class="cs-filter-btn" data-cs-filter="part1">Thuật ngữ (48 từ)</button>
+          <button class="cs-filter-btn" data-cs-filter="part3">Đúng / Sai (50 câu)</button>
+        </div>
+
+        <button id="printCheatSheetBtn" class="btn btn-outline" title="In hoặc lưu file PDF để đọc offline">
+          <span>🖨️</span> In / Lưu PDF
+        </button>
+      </div>
+
+      <div class="cheatsheet-stats-bar" id="cheatsheetStatsBar">
+        Hiển thị <strong id="cheatsheetCount">148</strong> kết quả
+      </div>
+
+      <div class="cheatsheet-cards-list" id="cheatsheetList">
+        <!-- Injected dynamically with rich search matches -->
+      </div>
+    </section>
+
+    <!-- Toast Notification Container (No blocking alerts) -->
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+    <!-- Keyboard Shortcuts Helper Overlay (Press ?) -->
+    <footer class="app-footer">
+      <div class="keyboard-legend">
+        <span class="legend-chip"><kbd>Enter</kbd> Kiểm tra / Câu tiếp</span>
+        <span class="legend-chip"><kbd>→</kbd> / <kbd>←</kbd> Chuyển câu</span>
+        <span class="legend-chip"><kbd>H</kbd> Gợi ý</span>
+        <span class="legend-chip"><kbd>R</kbd> Hiện đáp án</span>
+        <span class="legend-chip"><kbd>S</kbd> Đánh dấu sao</span>
+        <span class="legend-chip"><kbd>1-4</kbd> Chọn trắc nghiệm</span>
+        <span class="legend-chip"><kbd>T</kbd>/<kbd>F</kbd> Đúng/Sai</span>
+        <span class="legend-chip"><kbd>Space</kbd> Lật thẻ</span>
+      </div>
+      <div class="footer-note">
+        Chúc bạn ôn thi hiệu quả và đạt điểm tuyệt đối môn Tiếng Anh Chuyên Ngành! 🚀
+      </div>
+    </footer>
+  </div>
+
+  <!-- Data and Application Script -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
